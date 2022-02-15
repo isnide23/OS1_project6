@@ -15,8 +15,26 @@ int main (void) {
 }
 
 void *myalloc(int bytes) {
-    
-    return 0;
+    void *heap = sbrk(1024);
+
+    if (head == NULL) {
+        head = sbrk(1024);
+        head->next = NULL;
+        head->size = 1024 - PADDED_SIZE(sizeof(struct block));
+        head->in_use = 0;
+    }
+
+    // Walk the list looking for a free node
+    // let n = the free node
+    // If n's data big enough for user request
+
+    //     Mark n as used
+
+    //     Return address of n's data
+
+    // If we get here, there was no room
+    // return NULL
+        
 }
 
 
