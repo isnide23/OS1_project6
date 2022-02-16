@@ -14,14 +14,26 @@ int main (void) {
     printf("%p\n", p);
 }
 
-void *myalloc(int bytes) {
-    void *heap = sbrk(1024);
-
+void *myalloc(int size) {
+    // void *heap = sbrk(1024);
+    // if this is the first run
     if (head == NULL) {
         head = sbrk(1024);
         head->next = NULL;
         head->size = 1024 - PADDED_SIZE(sizeof(struct block));
         head->in_use = 0;
+    }
+
+    int padded_size = PADDED_SIZE(size);
+
+    block *cur = head;
+
+    while (cur != NULL) {
+        if (!(cur->in_use = 1) && cur->size >= padded_size) {
+            cur->in_use = 1;
+            printf("Found one!\n");
+        }
+        cur = cur->next;
     }
 
     // Walk the list looking for a free node
@@ -33,7 +45,7 @@ void *myalloc(int bytes) {
     //     Return address of n's data
 
     // If we get here, there was no room
-    // return NULL
+    return NULL;
         
 }
 
