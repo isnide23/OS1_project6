@@ -9,9 +9,11 @@ int main (void) {
 
     print_data();
     p = myalloc(16);
+    printf("%p\n", p);
     print_data();
     p = myalloc(16);
     printf("%p\n", p);
+    print_data();
 }
 
 void *myalloc(int size) {
@@ -29,9 +31,18 @@ void *myalloc(int size) {
     block *cur = head;
 
     while (cur != NULL) {
-        if (!(cur->in_use = 1) && cur->size >= padded_size) {
+        if (!(cur->in_use == 1) && cur->size >= padded_size) {
             cur->in_use = 1;
             printf("Found one!\n");
+            // check to see if there is actually enough space left
+            block *b = PTR_OFFSET(cur, PADDED_SIZE(sizeof(block)) + padded_size);
+            b->in_use = 0;
+            b->next = cur->next;
+            cur->next = b;
+            int b_size = cur->size - padded_size - PADDED_SIZE(sizeof(block));
+            b->size = b_size; 
+            cur->size = padded_size;
+            return PTR_OFFSET(cur, PADDED_SIZE(sizeof(block)));
         }
         cur = cur->next;
     }
@@ -60,8 +71,8 @@ void print_data(void) {
 
     while (b != NULL) {
         // Uncomment the following line if you want to see the pointer values
-        //printf("[%p:%d,%s]", b, b->size, b->in_use? "used": "free");
-        printf("[%d,%s]", b->size, b->in_use? "used": "free");
+        printf("[%p:%d,%s]", b, b->size, b->in_use? "used": "free");
+        // printf("[%d,%s]", b->size, b->in_use? "used": "free");
         if (b->next != NULL) {
             printf(" -> ");
         }
